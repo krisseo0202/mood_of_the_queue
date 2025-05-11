@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, date
 import json
-import tempfile
 import gspread
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -22,19 +21,16 @@ MOOD_MAP = {
 SHEET_ID = "173dOImclu9vOzDcBVBIJlivTt3efRYj4_zz3tm2_sUY"
 
 def service_account_file_from_secrets(section="gcp_service_json"):
-    sa_info = st.secrets[section]
-    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".json")
-    tmp.write(json.dumps(sa_info).encode())
-    tmp.close()
-    return tmp.name   
+    sa_info = dict(st.secrets["section"])
+    return sa_info
 
 def get_client():
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     ]
-    json_file = service_account_file_from_secrets()
-    creds = Credentials.from_service_account_info(json.loads(open(json_file).read()), scopes=scopes)
+    sa_info = service_account_file_from_secrets()
+    creds = Credentials.from_service_account_info(sa_info, scopes=scopes)
     return gspread.authorize(creds)
 
 
