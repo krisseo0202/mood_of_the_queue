@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from google.oauth2.service_account import Credentials
 
-CREDENTIALS_FILE = os.getenv("GSHEETS_CREDS", "credentials.json")
 EMOJIS = ['😍 (Happy)', '😐 (Neutral)', '😭 (Sad)', '😡 (Angry)', '😴 (Tired)', '😰 (Anxious)', '🤢 (Sick)', '😲 (Surprised)']
 MOOD_MAP = {
     '😍 (Happy)': 'Happy',
@@ -34,8 +33,8 @@ def get_client():
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     ]
-    path = service_account_file_from_secrets()
-    creds = Credentials.from_service_account_file(path, scopes=scopes)
+    json_file = service_account_file_from_secrets()
+    creds = Credentials.from_service_account_info(json.loads(open(json_file).read()), scopes=scopes)
     return gspread.authorize(creds)
 
 
@@ -107,8 +106,7 @@ def main():
     if "Timestamp" in df.columns and not df["Timestamp"].empty:
         min_d, max_d = df["Timestamp"].dt.date.min(), df["Timestamp"].dt.date.max()
         today = date.today()
-        default_value = today if today == max_d else max_d
-        picked = st.sidebar.date_input("Pick a date", value=default_value, min_value=min_d, max_value=max_d)
+        picked = st.sidebar.date_input("Pick a date", value=today, min_value=min_d, max_value=max_d)
         st.header(f"Mood stats for {picked}")
         plot_daily(df, picked)
     else:
