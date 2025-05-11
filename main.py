@@ -21,7 +21,7 @@ MOOD_MAP = {
 SHEET_ID = "173dOImclu9vOzDcBVBIJlivTt3efRYj4_zz3tm2_sUY"
 
 def service_account_file_from_secrets(section="gcp_service_json"):
-    sa_info = dict(st.secrets["section"])
+    sa_info = dict(st.secrets[section])
     return sa_info
 
 def get_client():
